@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Control Interno Ecobus</title><link rel="stylesheet" href="/static/portal.css"></head>
+<body>
+<header class="topbar">
+  <a class="logo" href="/"><img src="/static/img/ecobus-logo.png" alt="Ecobus"><span>Control Interno</span></a>
+  <nav><a class="active" href="/">Inicio</a><a href="#modulos">Módulos</a><a href="/importaciones">Importaciones</a></nav>
+  <div class="user"><div class="avatar" id="avatar">A</div><div><strong id="userName">Administrador</strong><span id="userRole">Administrador</span></div><a href="/logout">Salir</a></div>
+</header>
+<main>
+  <section class="hero">
+    <div class="hero-copy"><span class="eyebrow">PLATAFORMA EMPRESARIAL</span><h1>Control Interno Ecobus</h1><p>Gestión centralizada para Compras Ágiles, inventario interno y cálculo de pricing.</p><a class="hero-button" href="#modulos">Explorar módulos</a></div>
+    <img src="/static/img/hero-ecobus.svg" alt="Operación Ecobus">
+  </section>
+
+  <section class="kpis" aria-label="Resumen general">
+    <article><span>Compras registradas</span><strong id="kpiCompras">—</strong><small id="kpiComprasPending">Cargando...</small></article>
+    <article><span>Productos bajo mínimo</span><strong id="kpiAseo">—</strong><small>Inventario de aseo</small></article>
+    <article><span>Cotizaciones guardadas</span><strong id="kpiPricing">—</strong><small>Calculadora de pricing</small></article>
+    <article><span>Módulos operativos</span><strong>3</strong><small>En un solo sistema</small></article>
+  </section>
+
+  <section id="modulos" class="modules-section">
+    <div class="section-heading"><div><span class="eyebrow green">ACCESOS PRINCIPALES</span><h2>Módulos del sistema</h2><p>Selecciona el área que necesitas administrar.</p></div></div>
+    <div class="modules-grid">
+      <a class="module-card" href="/compras/"><div class="icon blue">🛒</div><div><h3>Compras Ágiles</h3><p>Licitaciones, adjudicaciones, archivos, facturación y pagos.</p></div><span>Ingresar →</span></a>
+      <a class="module-card" href="/aseo/"><div class="icon orange">📦</div><div><h3>Inventario y Aseo</h3><p>Stock, entregas, nómina, alertas semanales e historial.</p></div><span>Ingresar →</span></a>
+      <a class="module-card" href="/pricing/"><div class="icon green-bg">🧮</div><div><h3>Calculadora de Pricing</h3><p>Rutas Mapbox, costos operacionales, historial y PDF.</p></div><span>Ingresar →</span></a>
+      <a class="module-card muted-card" href="/importaciones"><div class="icon gray">⇧</div><div><h3>Centro de Importaciones</h3><p>Recupera respaldos JSON, CSV, Excel o bases exportadas.</p></div><span>Administrar →</span></a>
+      <div class="module-card muted-card future"><div class="icon gray">📊</div><div><h3>Reportes Gerenciales</h3><p>Panel consolidado entre módulos. Preparado para una siguiente etapa.</p></div><span>Próximamente</span></div>
+    </div>
+  </section>
+
+  <section class="principles"><article><b>🔒 Acceso centralizado</b><p>Un solo inicio de sesión para todos los módulos.</p></article><article><b>🗄 Datos persistentes</b><p>Una base PostgreSQL con tablas separadas por módulo.</p></article><article><b>↥ Importación disponible</b><p>Las bases parten limpias y puedes cargar respaldos después.</p></article><article><b>🌱 Identidad Ecobus</b><p>Diseño empresarial coherente y adaptable.</p></article></section>
+</main>
+<footer><img src="/static/img/ecobus-logo.png" alt="Ecobus"><span>Control Interno Ecobus · Plataforma de gestión empresarial</span></footer>
+<script src="/static/portal.js"></script>
+</body></html>

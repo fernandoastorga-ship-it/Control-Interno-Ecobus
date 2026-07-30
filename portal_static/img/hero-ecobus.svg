@@ -1,0 +1,15 @@
+<svg width="1200" height="520" viewBox="0 0 1200 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1200" y2="520" gradientUnits="userSpaceOnUse"><stop stop-color="#075B32"/><stop offset="1" stop-color="#13A45A"/></linearGradient><linearGradient id="road" x1="560" y1="320" x2="1080" y2="520" gradientUnits="userSpaceOnUse"><stop stop-color="#DFF7E8" stop-opacity=".62"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".08"/></linearGradient></defs>
+<rect width="1200" height="520" rx="28" fill="url(#g)"/>
+<circle cx="1024" cy="92" r="52" fill="#B8F34A" fill-opacity=".9"/>
+<path d="M0 345L175 235L300 310L458 176L635 310L782 225L980 330L1200 210V520H0V345Z" fill="#073D26" fill-opacity=".48"/>
+<path d="M0 398L206 312L356 377L545 278L730 380L890 297L1050 367L1200 322V520H0V398Z" fill="#0B7040" fill-opacity=".75"/>
+<path d="M420 520C562 423 698 355 850 322C972 296 1082 303 1200 351V520H420Z" fill="url(#road)"/>
+<path d="M789 341C833 326 890 323 949 331L1040 344C1069 348 1091 370 1096 398L1113 475H721L742 385C747 364 764 348 789 341Z" fill="white"/>
+<rect x="780" y="354" width="244" height="70" rx="10" fill="#DDF5E5"/>
+<path d="M792 363H849V411H792V363ZM861 363H918V411H861V363ZM930 363H1012V411H930V363Z" fill="#1F3B31"/>
+<rect x="750" y="428" width="340" height="38" rx="8" fill="#B8F34A"/>
+<circle cx="795" cy="474" r="30" fill="#183329"/><circle cx="795" cy="474" r="13" fill="#C7D2CC"/><circle cx="1035" cy="474" r="30" fill="#183329"/><circle cx="1035" cy="474" r="13" fill="#C7D2CC"/>
+<text x="870" y="455" fill="#083C24" font-family="Arial" font-weight="800" font-size="23">ECOBUS.CL</text>
+<g opacity=".55"><circle cx="95" cy="95" r="4" fill="white"/><circle cx="135" cy="65" r="3" fill="white"/><circle cx="218" cy="100" r="5" fill="white"/><circle cx="1130" cy="175" r="4" fill="white"/></g>
+</svg>

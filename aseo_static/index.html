@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Control Productos Aseo y Mantención</title>
+<style>
+:root{--green:#0f6b3a;--green2:#15834b;--bg:#f4f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--red:#b91c1c;--border:#e5e7eb}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}header{background:linear-gradient(90deg,var(--green),var(--green2));color:white;padding:18px 24px}header h1{margin:0;font-size:24px}header p{margin:4px 0 0;font-size:14px;opacity:.9}nav{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px;background:white;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}nav button{border:1px solid var(--border);background:#fff;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}nav button.active{background:var(--green);color:white;border-color:var(--green)}main{padding:20px;max-width:1450px;margin:0 auto}.view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}.kpi{font-size:28px;font-weight:800}.muted{color:var(--muted);font-size:13px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}.field label{font-size:13px;font-weight:700;color:#374151}input,select,textarea{padding:10px;border:1px solid #d1d5db;border-radius:9px;font-size:14px;background:white}input[type="number"]{width:130px}button.primary{background:var(--green);color:white;border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}button.secondary{background:#fff;color:var(--green);border:1px solid var(--green);border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}button.danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:8px;padding:8px 10px;cursor:pointer}table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left;font-size:14px}th{background:#f9fafb;font-size:13px;color:#374151}tr:hover{background:#f9fafb}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800}.Bus{background:#dbeafe;color:#1e40af}.Van{background:#ede9fe;color:#5b21b6}.Mantención{background:#dcfce7;color:#166534}.Otro{background:#f3f4f6;color:#374151}.ok{background:#dcfce7;color:#166534}.low{background:#fef3c7;color:#92400e}.critical{background:#fee2e2;color:#991b1b}.entrada{color:#166534;font-weight:800}.salida{color:#991b1b;font-weight:800}.scroll{overflow:auto}.small{font-size:12px}.linea{border:1px solid var(--border);border-radius:12px;padding:10px;margin:8px 0;background:#fafafa}.edit-box{display:none;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:12px;padding:12px;margin-bottom:14px}.edit-box.active{display:block}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{padding:7px 9px;border-radius:8px;font-weight:700;cursor:pointer}.btn-edit{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}.btn-delete{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}@media(max-width:900px){.grid,.two,.three{grid-template-columns:1fr}nav{position:static}input[type="number"]{width:100%}}
+</style>
+</head>
+<body>
+<header><h1>Control Interno de Productos de Aseo y Mantención</h1><p>Inventario local con stock editable, costos, entregas a trabajadores e historial automático.</p></header>
+<nav>
+<button class="tab active" data-view="dashboard">Dashboard</button><button class="tab" data-view="entrega">Registrar entrega</button><button class="tab" data-view="stock">Productos / Stock</button><button class="tab" data-view="conductores">Nómina</button><button class="tab" data-view="historial">Historial</button><button class="tab" data-view="reportes">Reportes</button><button onclick="location.href='/'">← Portal principal</button><button onclick="location.href='/logout'">Cerrar sesión</button>
+</nav>
+<main>
+<section id="dashboard" class="view active"><div class="grid"><div class="card"><div class="muted">Productos registrados</div><div class="kpi" id="kpiProductos">0</div></div><div class="card"><div class="muted">Stock valorizado</div><div class="kpi" id="kpiValor">$0</div></div><div class="card"><div class="muted">Productos bajo mínimo</div><div class="kpi" id="kpiBajo">0</div></div><div class="card"><div class="muted">Entregas del mes</div><div class="kpi" id="kpiEntregas">0</div></div></div><br><div class="two"><div class="card"><h3>Stock bajo / crítico</h3><div class="scroll"><table><thead><tr><th>Producto</th><th>Detalle</th><th>Stock</th><th>Mínimo</th><th>Estado</th></tr></thead><tbody id="tablaStockBajo"></tbody></table></div></div><div class="card"><h3>Últimos movimientos</h3><div class="scroll"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Cantidad</th><th>Responsable</th></tr></thead><tbody id="tablaUltimos"></tbody></table></div></div></div></section>
+<section id="entrega" class="view"><div class="card"><h2 id="tituloEntrega">Registrar entrega a trabajador</h2><div id="avisoEdicionEntrega" class="edit-box"><strong>Editando una entrega existente.</strong> Al guardar, el stock anterior se revertirá y se aplicarán las nuevas cantidades. <button class="secondary" type="button" onclick="cancelarEdicionEntrega()">Cancelar edición</button></div><div class="three"><div class="field"><label>Trabajador</label><select id="entConductor"></select></div><div class="field"><label>Fecha</label><input type="date" id="entFecha"></div><div class="field"><label>Entregado por</label><input id="entResponsable" value="Fernando"></div></div><h3>Productos entregados</h3><div id="lineasEntrega"></div><button class="secondary" type="button" onclick="agregarLineaEntrega()">+ Agregar producto</button> <button class="primary" id="btnRegistrarEntrega" type="button" onclick="registrarEntrega()">Registrar entrega y descontar stock</button></div></section>
+<section id="stock" class="view"><div class="two"><div class="card"><h2>Crear producto</h2><div class="field"><label>Nombre</label><input id="prodNombre" placeholder="Ej: Aromatizante"></div><div class="field"><label>Categoría</label><select id="prodCategoria"><option>Limpieza</option><option>Mantención</option></select></div><div class="field"><label>Detalle / olor</label><input id="prodDetalle" placeholder="Ej: Lavanda, Limón, Sin detalle"></div><div class="field"><label>Unidad de medida</label><select id="prodUnidad"><option>Unidad</option><option>Litros</option><option>Pares</option><option>Caja</option></select></div><div class="row"><div class="field"><label>Stock actual</label><input type="number" step="0.01" id="prodStock" value="0"></div><div class="field"><label>Stock mínimo</label><input type="number" step="0.01" id="prodMin" value="5"></div><div class="field"><label>Costo unitario</label><input type="number" id="prodCosto" value="0"></div></div><button class="primary" onclick="crearProducto()">Guardar producto</button></div><div class="card"><h2>Ingreso rápido de stock</h2><div class="field"><label>Producto</label><select id="ingProducto"></select></div><div class="row"><div class="field"><label>Cantidad que ingresa</label><input type="number" step="0.01" id="ingCantidad" value="0"></div><div class="field"><label>Fecha</label><input type="date" id="ingFecha"></div></div><div class="field"><label>Observación</label><input id="ingObs" placeholder="Ej: compra proveedor, ajuste inicial"></div><button class="primary" onclick="ingresarStock()">Sumar al stock</button></div></div><br><div class="card"><h2>Inventario actual</h2><div class="scroll"><table><thead><tr><th>Producto</th><th>Categoría</th><th>Detalle/Olor</th><th>Stock</th><th>Mínimo</th><th>Unidad</th><th>Costo</th><th>Valor</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tablaProductos"></tbody></table></div></div></section>
+<section id="conductores" class="view"><div class="two"><div class="card"><h2>Agregar persona a la nómina</h2><div class="field"><label>Área</label><select id="perArea"><option>Conductores</option><option>Mantención</option></select></div><div class="field"><label>Nombre</label><input id="perNombre" placeholder="Ej: Juan Pérez"></div><div class="row"><div class="field"><label>Patente</label><input id="perPatente" placeholder="Ej: LFYG-61"></div><div class="field"><label>N° máquina</label><input id="perMaquina" placeholder="Ej: 261"></div><div class="field"><label>Tipo vehículo / cargo</label><select id="perTipo"><option>Bus</option><option>Van</option><option>Mantención</option><option>Otro</option></select></div></div><button class="primary" onclick="crearPersona()">Agregar a nómina</button><p class="muted">Para personal de Mantención puedes dejar patente y máquina en blanco.</p></div><div class="card"><h2>Filtros</h2><div class="field"><label>Buscar</label><input id="filtroPersonas" oninput="renderConductores()" placeholder="Nombre, patente, máquina, área..."></div><div class="field"><label>Ver área</label><select id="filtroArea" onchange="renderConductores()"><option value="TODOS">Todos</option><option>Conductores</option><option>Mantención</option></select></div></div></div><br><div class="card"><h2>Nómina editable</h2><div class="scroll"><table><thead><tr><th>Área</th><th>Nombre</th><th>Patente</th><th>N° máquina</th><th>Tipo vehículo / cargo</th><th>Acciones</th></tr></thead><tbody id="tablaConductores"></tbody></table></div></div></section>
+<section id="historial" class="view"><div class="card"><h2>Entregas registradas</h2><p class="muted">Desde aquí puedes editar o eliminar una entrega completa. Al eliminarla, el stock se devuelve automáticamente.</p><div class="scroll"><table><thead><tr><th>Fecha</th><th>Trabajador</th><th>Patente</th><th>Área</th><th>Productos</th><th>Responsable</th><th>Acciones</th></tr></thead><tbody id="tablaEntregas"></tbody></table></div></div><br><div class="card"><h2>Historial de movimientos</h2><div class="row"><div class="field"><label>Buscar</label><input id="filtroHist" oninput="renderHistorial();renderEntregas()" placeholder="Trabajador, producto, patente..."></div><button class="secondary" onclick="exportarCSV()">Exportar CSV</button><button class="secondary" onclick="exportarRespaldo()">Exportar respaldo JSON</button><button class="secondary" onclick="document.getElementById('archivoRespaldo').click()">Importar respaldo</button><input id="archivoRespaldo" type="file" accept="application/json,.json" hidden onchange="importarRespaldo(this.files[0])"><button class="danger" onclick="resetDemo()">Reiniciar datos</button></div><div class="scroll"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Producto</th><th>Detalle</th><th>Cantidad</th><th>Trabajador</th><th>Patente</th><th>Área</th><th>Responsable</th><th>Obs.</th></tr></thead><tbody id="tablaHistorial"></tbody></table></div></div></section>
+<section id="reportes" class="view"><div class="two"><div class="card"><h2>Consumo por trabajador</h2><div class="scroll"><table><thead><tr><th>Trabajador</th><th>Área / tipo</th><th>Total retirado</th><th>Costo estimado</th></tr></thead><tbody id="tablaConsumoConductor"></tbody></table></div></div><div class="card"><h2>Consumo por producto</h2><div class="scroll"><table><thead><tr><th>Producto</th><th>Detalle</th><th>Total entregado</th><th>Costo estimado</th></tr></thead><tbody id="tablaConsumoProducto"></tbody></table></div></div></div></section>
+</main>
+<script>
+const conductoresIniciales=[['Emanuel Cartes','LFYG-61','261','Bus'],['Antonio Bermedo','LFYG-62','262','Bus'],['Taller','FYTG-72','272','Bus'],['Felix Lynch','TGCG-14','314','Bus'],['Lobos','VRKJ-17','317','Bus'],['Patricio Gonzalez','TBGK-33','333','Bus'],['Julio Vera','TBGK-34','334','Bus'],['Leopoldo Quezada','KPGY-46','344','Bus'],['Jaime Orellana','KPGY-45','345','Bus'],['Carolina Araya','JJVW-52','347','Bus'],['Benjamin Albornoz','JJVW-62','348','Bus'],['Pablo Garrido','PHVF-43','349','Bus'],['Luis Albornoz','PHVS-83','350','Bus'],['Alex Giuria','RJZH-69','351','Bus'],['Esteban Catalan','RKKJ-76','352','Bus'],['Williams Roman','KVDT-54','354','Bus'],['Carlos Cortez','RYZX-96','356','Bus'],['Alejandro Zavalla','KVDT-57','357','Bus'],['Manuel Ramirez','SCXX-61','361','Bus'],['Sergio Fernandez','TJZX-62','362','Bus'],['Luis Guerra','SCXX-63','363','Bus'],['Cristian Garrido','VRKH-66','366','Bus'],['Francisco Cisterna','VRKH-57','375','Bus'],['Luis Maureira','VRKJ-48','384','Bus'],['Jorge Gonzalez','VPYX-52','552','Bus'],['Carlos Catalan','VPZF-30','530','Bus'],['Patricia Armijo','RHJC-36','1','Van'],['Sergio Gonzalez','RHJC-37','2','Van'],['Taller','VGKY-17','17','Van'],['Jorge Reyes','PFWZ-37','37','Van'],['Humberto Sigl','PFWZ-38','38','Van'],['Carlos Garcias','PFWZ-49','49','Van'],['Giselle Lacomas','TYKD-51','51','Van'],['Rommy Sanchez','JKYW-53','53','Van'],['Hector Valderrma','JKYW-54','54','Van'],['Karen Orozco','PFWZ-56','56','Van'],['Andres Schneider','PFSV-57','57','Van'],['Gloria Nuñez','TZRW-79','79','Van'],['Oscar Reyes','JKXX-89','89','Van'],['Taller','JKXX-90','90','Van']].map((x,i)=>({id:i+1,area:'Conductores',nombre:x[0],patente:x[1],maquina:x[2],tipo:x[3]}));
+const productosIniciales=[['Aromatizante','Limpieza','Editar olor','Litros',0,5,0],['Limpia vidrio','Limpieza','Sin detalle','Litros',0,5,0],['Renovador de goma','Limpieza','Sin detalle','Litros',0,5,0],['Paño de piso','Limpieza','Sin detalle','Unidad',0,5,0],['Pañal','Limpieza','Sin detalle','Unidad',0,5,0],['Escobillón','Limpieza','Sin detalle','Unidad',0,5,0],['Limpiador de piso','Limpieza','Editar olor','Litros',0,5,0],['Guantes','Mantención','Sin detalle','Pares',0,5,0],['Lentes antiparras','Mantención','Sin detalle','Unidad',0,5,0],['Mascarillas','Mantención','Sin detalle','Unidad',0,5,0]].map((x,i)=>({id:i+1,nombre:x[0],categoria:x[1],detalle:x[2],unidad:x[3],stock:x[4],min:x[5],costo:x[6]}));
+let state={productos:productosIniciales,conductores:conductoresIniciales,movimientos:[]};
+let savePromise=Promise.resolve();
+let entregaEnEdicionId=null;
+function migrarDatos(){
+  state.productos=(state.productos||[]).map(p=>{if(!p.unidad){let n=(p.nombre||'').toLowerCase();p.unidad=(n.includes('aromatizante')||n.includes('limpia vidrio')||n.includes('renovador')||n.includes('limpiador de piso'))?'Litros':(n.includes('guantes')?'Pares':'Unidad')}return p});
+  state.conductores=(state.conductores||[]).map(c=>{if(!c.area)c.area='Conductores';return c});
+  const gruposLegacy=new Map();
+  state.movimientos=(state.movimientos||[]).map((m,i)=>{
+    if(!m.unidad){let p=state.productos.find(x=>x.id==m.productoId);m.unidad=p?.unidad||'Unidad'}
+    if(!m.area){let c=state.conductores.find(x=>x.nombre==m.conductor);m.area=c?.area||''}
+    if(m.tipo==='SALIDA'&&!m.idEntrega){
+      const clave=[m.fecha,m.conductor,m.patente,m.responsable,m.obs].join('|');
+      if(!gruposLegacy.has(clave))gruposLegacy.set(clave,'LEG-'+String(i+1).padStart(6,'0'));
+      m.idEntrega=gruposLegacy.get(clave);
+    }
+    return m
+  })
+}
+migrarDatos();
+async function cargarEstado(){
+  const r=await fetch('/aseo/api/state',{credentials:'same-origin'});
+  if(!r.ok)throw new Error('No se pudo cargar la información desde la nube');
+  const remoto=await r.json();
+  const localRaw=localStorage.getItem('controlAseoEcobus');
+  if(localRaw){
+    try{
+      const local=JSON.parse(localRaw);
+      const remotoVacio=!remoto||!Array.isArray(remoto.movimientos)||remoto.movimientos.length===0;
+      const localTieneDatos=(local.movimientos?.length||0)>0||(local.productos||[]).some(p=>Number(p.stock)>0);
+      if(localTieneDatos&&remotoVacio&&confirm('Encontré datos antiguos guardados en este navegador. ¿Quieres transferirlos a la base de datos en la nube?')){
+        state=local;
+        migrarDatos();
+        await save(false);
+        localStorage.removeItem('controlAseoEcobus');
+        alert('Datos antiguos transferidos correctamente a la nube.');
+        return;
+      }
+    }catch(e){console.warn('No se pudo leer el almacenamiento local antiguo',e)}
+  }
+  if(remoto&&Array.isArray(remoto.productos)&&Array.isArray(remoto.conductores)&&Array.isArray(remoto.movimientos)){
+    state=remoto;
+  }else{
+    state={productos:productosIniciales,conductores:conductoresIniciales,movimientos:[]};
+    await save(false);
+  }
+  migrarDatos();
+}
+function save(render=true){
+  const snapshot=JSON.stringify(state);
+  savePromise=savePromise.then(async()=>{
+    const r=await fetch('/aseo/api/state',{method:'PUT',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:snapshot});
+    if(!r.ok){const t=await r.text();throw new Error(t||'No se pudo guardar')}
+    localStorage.setItem('controlAseoEcobus_respaldo_local',snapshot);
+    if(render)renderAll();
+  }).catch(e=>{
+    alert('No fue posible guardar en la nube. Revisa tu conexión e inténtalo nuevamente.\n\n'+e.message);
+    console.error(e);
+  });
+  return savePromise;
+}
+function money(n){return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Number(n)||0)}function today(){return new Date().toISOString().slice(0,10)}function fmtCantidad(n,u){let num=Number(n)||0;let txt=(u=='Litros')?num.toLocaleString('es-CL',{maximumFractionDigits:2}):num.toLocaleString('es-CL',{maximumFractionDigits:0});return txt+' '+(u||'Unidad')}document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.view').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.view).classList.add('active');renderAll()});
+function productoLabel(p){return p.nombre+(p.detalle&&p.detalle!='Sin detalle'?' - '+p.detalle:'')}function opcionesProductos(){return state.productos.map(p=>`<option value="${p.id}">${productoLabel(p)} | Stock: ${fmtCantidad(p.stock,p.unidad)}</option>`).join('')}
+function cargarOpcionesProducto(select,valorActual=''){if(!select)return;select.innerHTML=opcionesProductos();if(valorActual!==''&&valorActual!=null)select.value=String(valorActual)}
+function renderSelects(){
+  const ingresoActual=ingProducto?.value;
+  const conductorActual=entConductor?.value;
+  if(ingProducto)cargarOpcionesProducto(ingProducto,ingresoActual);
+  document.querySelectorAll('.selProducto').forEach(s=>{const actual=s.value;cargarOpcionesProducto(s,actual)});
+  if(entConductor){entConductor.innerHTML=state.conductores.map(c=>`<option value="${c.id}">${c.nombre} | ${c.area||'Conductores'} | ${c.patente||'-'} | ${c.tipo||'-'}</option>`).join('');if(conductorActual)entConductor.value=conductorActual}
+}function estadoStock(p){if(p.stock<=0)return '<span class="badge critical">Sin stock</span>';if(p.stock<=p.min)return '<span class="badge low">Bajo</span>';return '<span class="badge ok">OK</span>'}
+function renderProductos(){tablaProductos.innerHTML=state.productos.map(p=>`<tr><td><input value="${p.nombre}" onchange="editProd(${p.id},'nombre',this.value)"></td><td><select onchange="editProd(${p.id},'categoria',this.value)"><option ${p.categoria=='Limpieza'?'selected':''}>Limpieza</option><option ${p.categoria=='Mantención'?'selected':''}>Mantención</option></select></td><td><input value="${p.detalle||''}" onchange="editProd(${p.id},'detalle',this.value)"></td><td><input type="number" step="0.01" value="${p.stock}" onchange="editProd(${p.id},'stock',this.value)"></td><td><input type="number" step="0.01" value="${p.min}" onchange="editProd(${p.id},'min',this.value)"></td><td><select onchange="editProd(${p.id},'unidad',this.value)"><option ${p.unidad=='Unidad'?'selected':''}>Unidad</option><option ${p.unidad=='Litros'?'selected':''}>Litros</option><option ${p.unidad=='Pares'?'selected':''}>Pares</option><option ${p.unidad=='Caja'?'selected':''}>Caja</option></select></td><td><input type="number" value="${p.costo}" onchange="editProd(${p.id},'costo',this.value)"></td><td>${money(p.stock*p.costo)}</td><td>${estadoStock(p)}</td><td><button class="danger" onclick="eliminarProducto(${p.id})">Eliminar</button></td></tr>`).join('')}function editProd(id,campo,val){const p=state.productos.find(x=>x.id==id);p[campo]=['stock','min','costo'].includes(campo)?Number(val):val;save()}function eliminarProducto(id){if(confirm('¿Eliminar producto?')){state.productos=state.productos.filter(p=>p.id!=id);save()}}function crearProducto(){let p={id:Date.now(),nombre:prodNombre.value.trim(),categoria:prodCategoria.value,detalle:prodDetalle.value||'Sin detalle',unidad:prodUnidad.value,stock:Number(prodStock.value)||0,min:Number(prodMin.value)||0,costo:Number(prodCosto.value)||0};if(!p.nombre)return alert('Ingresa nombre');state.productos.push(p);prodNombre.value='';prodDetalle.value='';save()}function ingresarStock(){let p=state.productos.find(x=>x.id==ingProducto.value),cant=Number(ingCantidad.value)||0;if(!p||cant<=0)return alert('Cantidad inválida');p.stock+=cant;state.movimientos.push({fecha:ingFecha.value||today(),tipo:'ENTRADA',productoId:p.id,producto:p.nombre,detalle:p.detalle,cantidad:cant,unidad:p.unidad,conductor:'',patente:'',tipoVehiculo:'',area:'',responsable:'Admin',obs:ingObs.value});ingCantidad.value=0;ingObs.value='';save()}
+function agregarLineaEntrega(productoId='',cantidad=1){
+  let div=document.createElement('div');div.className='row linea';
+  div.innerHTML=`<div class="field"><label>Producto</label><select class="selProducto"></select></div><div class="field"><label>Cantidad</label><input type="number" step="0.01" class="cantProducto" value="${cantidad}" min="0"></div><button class="danger" type="button" onclick="this.parentElement.remove()">Quitar</button>`;
+  lineasEntrega.appendChild(div);
+  cargarOpcionesProducto(div.querySelector('.selProducto'),productoId)
+}
+function inicioSemana(fecha){const d=new Date(fecha+'T12:00:00');const dia=(d.getDay()+6)%7;d.setDate(d.getDate()-dia);d.setHours(0,0,0,0);return d}
+function finSemana(fecha){const d=inicioSemana(fecha);d.setDate(d.getDate()+6);d.setHours(23,59,59,999);return d}
+function entregasAgrupadas(){
+  const mapa=new Map();
+  state.movimientos.filter(m=>m.tipo==='SALIDA').forEach(m=>{
+    const id=m.idEntrega||('MOV-'+m.fecha+'-'+m.conductor+'-'+m.productoId);
+    if(!mapa.has(id))mapa.set(id,{id,fecha:m.fecha,conductor:m.conductor,patente:m.patente,area:m.area,tipoVehiculo:m.tipoVehiculo,responsable:m.responsable,movimientos:[]});
+    mapa.get(id).movimientos.push(m)
+  });
+  return [...mapa.values()]
+}
+function alertaEntregaSemanal(conductor,fecha,excluirId=null){
+  const ini=inicioSemana(fecha),fin=finSemana(fecha);
+  const previas=entregasAgrupadas().filter(e=>e.id!==excluirId&&e.conductor===conductor&&(()=>{const d=new Date(e.fecha+'T12:00:00');return d>=ini&&d<=fin})());
+  if(!previas.length)return true;
+  const detalle=previas.map(e=>`${e.fecha}: ${e.movimientos.map(m=>`${m.producto} (${fmtCantidad(m.cantidad,m.unidad)})`).join(', ')}`).join('\n');
+  return confirm(`⚠ ${conductor} ya tiene otra entrega registrada durante esta misma semana.
+
+${detalle}
+
+¿Deseas registrar esta nueva entrega de todas formas?`)
+}
+function registrarEntrega(){
+  let c=state.conductores.find(x=>x.id==entConductor.value);
+  if(!c)return alert('Selecciona un trabajador');
+  let fecha=entFecha.value||today();
+  let lineas=[...document.querySelectorAll('#lineasEntrega .linea')];
+  if(!lineas.length)return alert('Agrega al menos un producto');
+  const items=[];
+  for(const l of lineas){
+    let p=state.productos.find(x=>x.id==l.querySelector('.selProducto').value);let cant=Number(l.querySelector('.cantProducto').value)||0;
+    if(!p)return alert('Selecciona un producto válido');if(cant<=0)return alert('Cantidad inválida');items.push({p,cant})
+  }
+  const anteriores=entregaEnEdicionId?state.movimientos.filter(m=>m.tipo==='SALIDA'&&m.idEntrega===entregaEnEdicionId):[];
+  for(const item of items){
+    const devuelto=anteriores.filter(m=>m.productoId==item.p.id).reduce((a,m)=>a+Number(m.cantidad||0),0);
+    const disponible=Number(item.p.stock)+devuelto;
+    if(disponible<item.cant)return alert(`Stock insuficiente para ${productoLabel(item.p)}. Stock disponible: ${fmtCantidad(disponible,item.p.unidad)}`)
+  }
+  if(!alertaEntregaSemanal(c.nombre,fecha,entregaEnEdicionId))return;
+  if(anteriores.length){anteriores.forEach(m=>{let p=state.productos.find(x=>x.id==m.productoId);if(p)p.stock+=Number(m.cantidad||0)});state.movimientos=state.movimientos.filter(m=>!(m.tipo==='SALIDA'&&m.idEntrega===entregaEnEdicionId))}
+  const idEntrega=entregaEnEdicionId||('ENT-'+Date.now());
+  items.forEach(({p,cant})=>{p.stock-=cant;state.movimientos.push({idEntrega,fecha,tipo:'SALIDA',productoId:p.id,producto:p.nombre,detalle:p.detalle,cantidad:cant,unidad:p.unidad,conductor:c.nombre,patente:c.patente,tipoVehiculo:c.tipo,area:c.area||'Conductores',responsable:entResponsable.value||'Admin',obs:'Entrega a trabajador'})});
+  const editando=Boolean(entregaEnEdicionId);cancelarEdicionEntrega(false);save();alert(editando?'Entrega actualizada correctamente':'Entrega registrada y stock descontado')
+}
+function editarEntrega(idEntrega){
+  const entrega=entregasAgrupadas().find(e=>e.id===idEntrega);if(!entrega)return alert('No se encontró la entrega');
+  const conductor=state.conductores.find(c=>c.nombre===entrega.conductor&&c.patente===entrega.patente)||state.conductores.find(c=>c.nombre===entrega.conductor);
+  entregaEnEdicionId=idEntrega;document.querySelector('[data-view="entrega"]').click();
+  if(conductor)entConductor.value=conductor.id;entFecha.value=entrega.fecha;entResponsable.value=entrega.responsable||'';
+  lineasEntrega.innerHTML='';entrega.movimientos.forEach(m=>agregarLineaEntrega(m.productoId,m.cantidad));
+  avisoEdicionEntrega.classList.add('active');tituloEntrega.textContent='Editar entrega';btnRegistrarEntrega.textContent='Guardar cambios en la entrega';window.scrollTo({top:0,behavior:'smooth'})
+}
+function cancelarEdicionEntrega(reponerLinea=true){
+  entregaEnEdicionId=null;avisoEdicionEntrega.classList.remove('active');tituloEntrega.textContent='Registrar entrega a trabajador';btnRegistrarEntrega.textContent='Registrar entrega y descontar stock';lineasEntrega.innerHTML='';if(reponerLinea)agregarLineaEntrega();entFecha.value=today()
+}
+function eliminarEntrega(idEntrega){
+  const entrega=entregasAgrupadas().find(e=>e.id===idEntrega);if(!entrega)return alert('No se encontró la entrega');
+  const detalle=entrega.movimientos.map(m=>`• ${m.producto}: ${fmtCantidad(m.cantidad,m.unidad)}`).join('\n');
+  if(!confirm(`¿Eliminar esta entrega de ${entrega.conductor}?
+
+${detalle}
+
+El stock será devuelto automáticamente.`))return;
+  entrega.movimientos.forEach(m=>{let p=state.productos.find(x=>x.id==m.productoId);if(p)p.stock+=Number(m.cantidad||0)});
+  state.movimientos=state.movimientos.filter(m=>!(m.tipo==='SALIDA'&&m.idEntrega===idEntrega));
+  if(entregaEnEdicionId===idEntrega)cancelarEdicionEntrega();save();alert('Entrega eliminada y stock devuelto correctamente')
+}
+function renderConductores(){let q=(filtroPersonas?.value||'').toLowerCase();let area=filtroArea?.value||'TODOS';let data=state.conductores.filter(c=>(area=='TODOS'||c.area==area)&&JSON.stringify(c).toLowerCase().includes(q));tablaConductores.innerHTML=data.map(c=>`<tr><td><select onchange="editPersona(${c.id},'area',this.value)"><option ${c.area=='Conductores'?'selected':''}>Conductores</option><option ${c.area=='Mantención'?'selected':''}>Mantención</option></select></td><td><input value="${c.nombre||''}" onchange="editPersona(${c.id},'nombre',this.value)"></td><td><input value="${c.patente||''}" onchange="editPersona(${c.id},'patente',this.value)"></td><td><input value="${c.maquina||''}" onchange="editPersona(${c.id},'maquina',this.value)"></td><td><select onchange="editPersona(${c.id},'tipo',this.value)"><option ${c.tipo=='Bus'?'selected':''}>Bus</option><option ${c.tipo=='Van'?'selected':''}>Van</option><option ${c.tipo=='Mantención'?'selected':''}>Mantención</option><option ${c.tipo=='Otro'?'selected':''}>Otro</option></select></td><td><button class="danger" onclick="eliminarPersona(${c.id})">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="6">Sin registros</td></tr>'}function crearPersona(){let c={id:Date.now(),area:perArea.value,nombre:perNombre.value.trim(),patente:perPatente.value.trim(),maquina:perMaquina.value.trim(),tipo:perTipo.value};if(!c.nombre)return alert('Ingresa el nombre');state.conductores.push(c);perNombre.value='';perPatente.value='';perMaquina.value='';save()}function editPersona(id,campo,val){let c=state.conductores.find(x=>x.id==id);if(!c)return;c[campo]=val;save()}function eliminarPersona(id){if(confirm('¿Eliminar esta persona de la nómina?')){state.conductores=state.conductores.filter(c=>c.id!=id);save()}}
+function renderEntregas(){
+  let q=(filtroHist?.value||'').toLowerCase();
+  let data=entregasAgrupadas().filter(e=>JSON.stringify(e).toLowerCase().includes(q)).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  tablaEntregas.innerHTML=data.map(e=>`<tr><td>${e.fecha}</td><td>${e.conductor||'-'}</td><td>${e.patente||'-'}</td><td>${e.area||'-'}</td><td>${e.movimientos.map(m=>`${m.producto}: ${fmtCantidad(m.cantidad,m.unidad)}`).join('<br>')}</td><td>${e.responsable||'-'}</td><td><div class="actions"><button class="btn-edit" onclick="editarEntrega('${e.id}')">Editar</button><button class="btn-delete" onclick="eliminarEntrega('${e.id}')">Eliminar</button></div></td></tr>`).join('')||'<tr><td colspan="7">Sin entregas registradas</td></tr>'
+}
+function renderHistorial(){let q=(filtroHist?.value||'').toLowerCase();let mov=state.movimientos.filter(m=>JSON.stringify(m).toLowerCase().includes(q)).slice().reverse();tablaHistorial.innerHTML=mov.map(m=>`<tr><td>${m.fecha}</td><td class="${m.tipo=='ENTRADA'?'entrada':'salida'}">${m.tipo}</td><td>${m.producto}</td><td>${m.detalle||''}</td><td>${fmtCantidad(m.cantidad,m.unidad)}</td><td>${m.conductor||'-'}</td><td>${m.patente||'-'}</td><td>${m.area||'-'}</td><td>${m.responsable||'-'}</td><td>${m.obs||''}</td></tr>`).join('')}function renderDashboard(){kpiProductos.textContent=state.productos.length;kpiValor.textContent=money(state.productos.reduce((a,p)=>a+p.stock*p.costo,0));kpiBajo.textContent=state.productos.filter(p=>p.stock<=p.min).length;let mes=today().slice(0,7);kpiEntregas.textContent=state.movimientos.filter(m=>m.tipo=='SALIDA'&&m.fecha.slice(0,7)==mes).length;tablaStockBajo.innerHTML=state.productos.filter(p=>p.stock<=p.min).map(p=>`<tr><td>${p.nombre}</td><td>${p.detalle||''}</td><td>${fmtCantidad(p.stock,p.unidad)}</td><td>${fmtCantidad(p.min,p.unidad)}</td><td>${estadoStock(p)}</td></tr>`).join('')||'<tr><td colspan="5">Sin productos bajo mínimo</td></tr>';tablaUltimos.innerHTML=state.movimientos.slice(-8).reverse().map(m=>`<tr><td>${m.fecha}</td><td class="${m.tipo=='ENTRADA'?'entrada':'salida'}">${m.tipo}</td><td>${m.producto}</td><td>${fmtCantidad(m.cantidad,m.unidad)}</td><td>${m.conductor||m.responsable||'-'}</td></tr>`).join('')}
+function renderReportes(){let porC={},porP={};state.movimientos.filter(m=>m.tipo=='SALIDA').forEach(m=>{let p=state.productos.find(x=>x.id==m.productoId)||{costo:0,unidad:m.unidad};let kc=m.conductor+'|'+(m.area||m.tipoVehiculo||'');porC[kc]=porC[kc]||{cant:0,costo:0,unidad:m.unidad||p.unidad};porC[kc].cant+=m.cantidad;porC[kc].costo+=m.cantidad*p.costo;let kp=m.producto+'|'+(m.detalle||'');porP[kp]=porP[kp]||{cant:0,costo:0,unidad:m.unidad||p.unidad};porP[kp].cant+=m.cantidad;porP[kp].costo+=m.cantidad*p.costo});tablaConsumoConductor.innerHTML=Object.entries(porC).sort((a,b)=>b[1].cant-a[1].cant).map(([k,v])=>{let[n,t]=k.split('|');return`<tr><td>${n}</td><td>${t}</td><td>${fmtCantidad(v.cant,v.unidad)}</td><td>${money(v.costo)}</td></tr>`}).join('');tablaConsumoProducto.innerHTML=Object.entries(porP).sort((a,b)=>b[1].cant-a[1].cant).map(([k,v])=>{let[n,d]=k.split('|');return`<tr><td>${n}</td><td>${d}</td><td>${fmtCantidad(v.cant,v.unit||v.unidad)}</td><td>${money(v.costo)}</td></tr>`}).join('')}function exportarCSV(){let rows=[['Fecha','Tipo','Producto','Detalle','Cantidad','Unidad','Trabajador','Patente','Area','TipoVehiculo','Responsable','Observacion'],...state.movimientos.map(m=>[m.fecha,m.tipo,m.producto,m.detalle,m.cantidad,m.unidad,m.conductor,m.patente,m.area,m.tipoVehiculo,m.responsable,m.obs])];let csv=rows.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(';')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='historial_productos_aseo.csv';a.click()}function exportarRespaldo(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='respaldo_control_aseo_'+today()+'.json';a.click();URL.revokeObjectURL(a.href)
+}
+async function importarRespaldo(file){
+  if(!file)return;
+  try{
+    const data=JSON.parse(await file.text());
+    if(!Array.isArray(data.productos)||!Array.isArray(data.conductores)||!Array.isArray(data.movimientos))throw new Error('El archivo no tiene el formato esperado');
+    if(!confirm('Esto reemplazará la información actual por la del respaldo. ¿Continuar?'))return;
+    state=data;migrarDatos();await save();alert('Respaldo importado correctamente.');
+  }catch(e){alert('No se pudo importar el respaldo: '+e.message)}
+  finally{document.getElementById('archivoRespaldo').value=''}
+}
+async function resetDemo(){
+  if(confirm('Esto reiniciará productos, stock, nómina editada y movimientos en la base de datos. ¿Continuar?')){
+    state={productos:productosIniciales.map(x=>({...x})),conductores:conductoresIniciales.map(x=>({...x})),movimientos:[]};
+    await save();
+  }
+}
+function renderAll(){renderSelects();renderProductos();renderConductores();renderEntregas();renderHistorial();renderDashboard();renderReportes()}
+async function iniciarApp(){
+  try{
+    await cargarEstado();
+    entFecha.value=today();ingFecha.value=today();renderAll();agregarLineaEntrega();
+  }catch(e){
+    console.error(e);alert('No se pudo iniciar la aplicación: '+e.message);
+  }
+}
+iniciarApp();
+</script>
+</body>
+</html>

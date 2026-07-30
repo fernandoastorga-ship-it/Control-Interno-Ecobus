@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Compras Ágiles</title>
+  <link rel="stylesheet" href="/compras/static/styles.css" />
+</head>
+<body>
+  <section class="profile-screen" id="profileScreen">
+    <div class="profile-card">
+      <div class="profile-logo">🛒</div>
+      <h1>Registro de Compras Ágiles</h1>
+      <p>Selecciona tu perfil para ver tus compras, archivos y seguimiento de pagos.</p>
+      <div class="migration-box hidden" id="migrationBox">
+        <strong>Encontré información antigua en este navegador</strong>
+        <span id="migrationText"></span>
+        <button class="btn primary" id="btnMigrarLocal" type="button">Transferir a la nube</button>
+      </div>
+      <div class="profile-grid" id="profileGrid"><p class="muted">Cargando perfiles...</p></div>
+      <form class="new-profile" id="formNuevoPerfil">
+        <input type="text" id="nuevoPerfilNombre" placeholder="Crear nuevo perfil" />
+        <button class="btn primary" type="submit">Crear perfil</button>
+      </form>
+      <div class="portal-links"><a class="logout-link" href="/">← Portal principal</a><a class="logout-link" href="/logout">Cerrar sesión</a></div>
+    </div>
+  </section>
+
+  <div class="app hidden" id="appRoot">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🛒</div>
+        <div class="brand-text"><h1>Mis Compras Ágiles</h1><p>Sistema interno</p></div>
+      </div>
+      <button class="collapse-btn" id="btnToggleSidebar" title="Achicar barra lateral">☰</button>
+      <nav class="menu">
+        <button class="menu-item active" data-view="compras"><span>📋</span><b>Compras</b></button>
+        <button class="menu-item" data-view="resumen"><span>📊</span><b>Resumen</b></button>
+      </nav>
+      <div class="sidebar-footer">
+        <strong id="sidebarProfileName">Perfil</strong>
+        <span>Control interno de licitaciones</span>
+        <button class="switch-profile" id="btnCambiarPerfil">Cambiar perfil</button>
+        <a class="switch-profile" href="/">← Portal principal</a><a class="switch-profile logout-sidebar" href="/logout">Cerrar sesión</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow" id="perfilActivoTexto">Perfil activo</div>
+          <h2>Registro de Compras Ágiles</h2>
+          <p>Gestiona, controla y da seguimiento a todas las compras en las que participas.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn secondary" id="btnExportar">Exportar CSV</button>
+          <button class="btn secondary" id="btnExportarBackup">Exportar backup JSON</button>
+          <button class="btn secondary" id="btnImportarBackup">Importar backup</button>
+          <input type="file" id="archivoBackup" accept="application/json,.json" class="hidden" />
+          <button class="btn danger" id="btnLimpiar">Limpiar perfil</button>
+          <button class="btn primary" id="btnNuevaCompra">+ Nueva Compra</button>
+        </div>
+      </header>
+
+      <div class="status-banner hidden" id="statusBanner"></div>
+      <section class="cards" id="summaryCards"></section>
+
+      <section class="panel" id="viewCompras">
+        <div class="panel-header">
+          <div><h3>Compras registradas</h3><p class="muted">Los datos y adjuntos se guardan en PostgreSQL en la nube.</p></div>
+          <div class="filters">
+            <input type="search" id="buscador" placeholder="Buscar por cliente, ID, destino o detalle..." />
+            <select id="filtroEstado">
+              <option value="TODOS">Todos los estados</option>
+              <option value="EN_EVALUACION">En evaluación</option>
+              <option value="GANADA">Ganada / Adquirida</option>
+              <option value="PERDIDA">Perdida</option>
+              <option value="DESIERTA">Desierta</option>
+            </select>
+            <select id="filtroPago">
+              <option value="TODOS">Todos los pagos</option>
+              <option value="PENDIENTE">Pendiente de pago</option>
+              <option value="PAGADO">Pago registrado</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha publicación</th><th>Cliente / Institución</th><th>ID</th><th>Destino</th><th>Detalle servicio</th><th>Monto cobrado</th><th>Cierre 1er llamado</th><th>Factor comercial</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tablaCompras"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="viewResumen"><h3>Resumen comercial</h3><div class="summary-grid" id="resumenDetalle"></div></section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="modalCompra">
+    <div class="modal-content">
+      <div class="modal-header"><h3 id="modalTitle">Nueva Compra Ágil</h3><button class="icon-btn" id="btnCerrarModal">×</button></div>
+      <form id="formCompra">
+        <input type="hidden" id="compraIdInterno" />
+        <div class="form-grid">
+          <label>Fecha de publicación<input type="date" id="fechaPublicacion" required /></label>
+          <label>Cliente / Institución<input type="text" id="cliente" placeholder="Ej: Municipalidad de..." required /></label>
+          <label>ID de compra<input type="text" id="idCompra" placeholder="Ej: 1234-56-L124" required /></label>
+          <label>Destino<input type="text" id="destino" placeholder="Ej: Santiago, Valparaíso..." /></label>
+          <label class="full">Detalle del servicio<textarea id="detalleServicio" rows="3" placeholder="Describe el traslado, horario, pasajeros, requerimientos, etc."></textarea></label>
+          <label>Monto cobrado<input type="number" id="montoCobrado" min="0" step="1" placeholder="Ej: 850000" /></label>
+          <label>Fecha cierre primer llamado<input type="date" id="fechaCierre" /></label>
+          <label>Factor comercial cobrado (%)<input type="number" id="factorComercial" min="0" step="0.01" placeholder="Ej: 8" /></label>
+          <label>Estado<select id="estado"><option value="EN_EVALUACION">En evaluación</option><option value="GANADA">Ganada / Adquirida</option><option value="PERDIDA">Perdida</option><option value="DESIERTA">Desierta</option></select></label>
+        </div>
+        <div class="attachments-section">
+          <h4>Archivos adjuntos de la compra</h4>
+          <p class="helper-text">Los archivos quedarán almacenados junto a la compra en la base de datos de la nube. Máximo 10 MB por archivo.</p>
+          <label class="file-drop"><span>📎 Seleccionar archivos</span><input type="file" id="archivosCompra" multiple /></label>
+          <div class="attached-list" id="listaArchivosModal"></div>
+        </div>
+        <div class="won-section hidden" id="seccionGanada">
+          <h4>Información adicional para compra ganada/adquirida</h4>
+          <div class="form-grid">
+            <label>ID Orden de Compra<input type="text" id="ordenCompraId" placeholder="Ej: OC-2026-1234" /></label>
+            <label>Contacto facturación - Nombre<input type="text" id="facturacionNombre" /></label>
+            <label>Contacto facturación - Email<input type="email" id="facturacionEmail" /></label>
+            <label>Contacto facturación - Teléfono<input type="text" id="facturacionTelefono" /></label>
+            <label>Contacto coordinación - Nombre<input type="text" id="coordinacionNombre" /></label>
+            <label>Contacto coordinación - Email<input type="email" id="coordinacionEmail" /></label>
+            <label>Contacto coordinación - Teléfono<input type="text" id="coordinacionTelefono" /></label>
+            <label>Fecha envío factura<input type="date" id="fechaEnvioFactura" /></label>
+            <label>Fecha de pago<input type="date" id="fechaPago" /></label>
+          </div>
+        </div>
+        <div class="modal-actions"><button type="button" class="btn secondary" id="btnCancelar">Cancelar</button><button type="submit" class="btn primary" id="btnGuardarCompra">Guardar compra</button></div>
+      </form>
+    </div>
+  </div>
+  <script src="/compras/static/app.js"></script>
+</body>
+</html>

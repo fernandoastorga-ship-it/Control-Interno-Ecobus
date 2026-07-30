@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora de Pricing | Ecobus</title>
+  <link rel="stylesheet" href="/pricing/static/styles.css" />
+  <script defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<header class="module-header">
+  <div class="brand"><img src="/pricing/assets/logo-ecobus.png" alt="Ecobus"><div><strong>Control Interno Ecobus</strong><span>Calculadora de Pricing</span></div></div>
+  <nav><a href="/">← Portal principal</a><a href="/logout">Cerrar sesión</a></nav>
+</header>
+<main class="page">
+  <section class="hero"><div><span class="eyebrow">COTIZACIÓN INTERNA</span><h1>Calculadora de precios Ecobus</h1><p>Calcula rutas, costos operacionales y valores comerciales. Las cotizaciones guardadas quedan registradas en la base de datos.</p></div><div class="hero-badge">Bus · Taxibús · Van</div></section>
+
+  <div class="layout">
+    <section class="card calculator-card">
+      <div class="section-title"><div><h2>Nueva cotización</h2><p>Completa los datos del servicio y selecciona las direcciones desde el buscador.</p></div><span id="modoEdicion" class="edit-pill hidden">Editando</span></div>
+      <div class="form-grid">
+        <label>Nombre cliente<input type="text" id="nombreCliente" placeholder="Empresa o solicitante"></label>
+        <label>Fecha del servicio<input type="date" id="fechaServicio"></label>
+        <label>Cantidad de pasajeros<input type="number" id="cantidadPasajeros" min="1"></label>
+        <label>Tipo de vehículo<select id="vehiculo"><option value="bus">Bus</option><option value="taxibus">Taxibús</option><option value="van">Van</option></select></label>
+        <label class="full">Origen<mapbox-search-box id="origenSearch" proximity="-70.87649,-33.60627" country="CL"></mapbox-search-box></label>
+        <label class="full">Destino<mapbox-search-box id="destinoSearch" proximity="-70.87649,-33.60627" country="CL"></mapbox-search-box></label>
+        <label>Tipo de viaje<select id="tipoViaje"><option value="ida">Solo ida</option><option value="ida_vuelta">Ida y vuelta</option></select></label>
+        <label>Precio petróleo<input type="number" id="petroleo" value="1450" min="1"></label>
+        <label>Factor comercial<input type="number" id="factor" value="3.7" step="0.1" min="0.1"></label>
+      </div>
+      <div class="actions"><button class="primary" id="btnCalcular">Calcular precio</button><button class="secondary hidden" id="btnCancelarEdicion">Cancelar edición</button></div>
+      <div id="resultado" class="result hidden"></div>
+    </section>
+
+    <aside class="card help-card">
+      <h3>Parámetros operacionales</h3>
+      <div class="parameter"><span>Bus</span><strong>2,9 km/L</strong></div>
+      <div class="parameter"><span>Taxibús</span><strong>3,1 km/L</strong></div>
+      <div class="parameter"><span>Van</span><strong>8 km/L</strong></div>
+      <p>La ruta considera la salida y regreso a la base de Peñaflor, según el tipo de viaje seleccionado.</p>
+    </aside>
+  </div>
+
+  <section class="card history-card">
+    <div class="section-title history-title"><div><h2>Historial de cotizaciones</h2><p>Puedes cargar, descargar, eliminar, exportar o importar respaldos.</p></div><div class="actions compact"><button class="secondary" id="btnExportar">Exportar JSON</button><button class="secondary" id="btnImportar">Importar JSON</button><input type="file" id="archivoImportar" accept="application/json,.json" hidden></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Ruta</th><th>Vehículo</th><th>Kilómetros</th><th>Precio</th><th>Acciones</th></tr></thead><tbody id="tablaCotizaciones"></tbody></table></div>
+  </section>
+</main>
+<script src="/pricing/config.js"></script>
+<script src="/pricing/static/app.js"></script>
+</body>
+</html>
