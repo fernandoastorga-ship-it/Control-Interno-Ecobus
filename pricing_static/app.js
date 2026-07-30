@@ -85,7 +85,7 @@ async function distancia(a, b) {
 }
 
 function datosVehiculo(tipo) {
-  if (tipo === "van") return { rendimiento: 8, texto: "Van" };
+  if (tipo === "van") return { rendimiento: 5,3, texto: "Van" };
   if (tipo === "taxibus") return { rendimiento: 3.1, texto: "Taxibús" };
   return { rendimiento: 2.9, texto: "Bus" };
 }
