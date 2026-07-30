@@ -308,7 +308,7 @@ async function descargarCotizacion() {
     const rows = [
       ["Cliente", r.nombre || "-"], ["Fecha del servicio", formatearFecha(r.fechaServ)], ["Pasajeros", r.pax || "-"],
       ["Origen", r.origenTexto || "-"], ["Destino", r.destinoTexto || "-"], ["Tipo de viaje", r.tipoViaje || "-"],
-      ["Vehículo", r.vehiculo || "-"], ["Distancia operacional", `${Number(r.kmTotal || 0).toLocaleString("es-CL")} km`]
+      ["Vehículo", r.vehiculo || "-"]
     ];
     let y = 101;
     for (const [label, value] of rows) {
