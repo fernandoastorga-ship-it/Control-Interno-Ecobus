@@ -3,27 +3,27 @@ services:
     name: control-interno-ecobus
     runtime: python
     plan: free
+
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
+    autoDeployTrigger: commit
+
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: control-interno-ecobus-db
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: ADMIN_USERNAME
-        value: admin
-      - key: ADMIN_PASSWORD
-        sync: false
-      - key: ADMIN_DISPLAY_NAME
-        value: Administrador Ecobus
-      - key: MAPBOX_TOKEN
         sync: false
 
-databases:
-  - name: control-interno-ecobus-db
-    plan: free
-    databaseName: control_interno_ecobus
-    user: ecobus_admin
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: ADMIN_USERNAME
+        value: admin
+
+      - key: ADMIN_PASSWORD
+        sync: false
+
+      - key: ADMIN_DISPLAY_NAME
+        value: Administrador Ecobus
+
+      - key: MAPBOX_TOKEN
+        sync: false
