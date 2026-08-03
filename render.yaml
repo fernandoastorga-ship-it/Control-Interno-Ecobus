@@ -3,18 +3,15 @@ services:
     name: control-interno-ecobus
     runtime: python
     plan: free
-
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     autoDeployTrigger: commit
 
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
 
-        - key: PYTHON_VERSION
-        value: 3.12.8
-
-        
       - key: DATABASE_URL
         sync: false
 
